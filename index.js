@@ -46,10 +46,6 @@ const generateId = () => {
     return Math.floor(Math.random() * 999) + 1
 }
 
-app.get('/', (req, res) => {
-    res.send('<h1>Hello world</h1>')
-})
-
 app.get('/info', (req, res) => {
     res.send(`Phonebook has info for ${persons.length} people. <br/><br/>${new Date()}`)
 })
