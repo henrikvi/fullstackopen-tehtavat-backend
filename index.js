@@ -3,6 +3,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
 
+// a custom token to display the body of http POST requests
 morgan.token('post-body', (req, res) => {
     if (req.method === 'POST' && req.body) {
         return JSON.stringify(req.body)
