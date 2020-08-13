@@ -2,6 +2,8 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const Contact = require('./models/contact')
+
 const app = express()
 
 // a custom token to display the body of http POST requests
@@ -16,56 +18,31 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'))
 
-let persons = [
-      {
-        "name": "Arto Hellas",
-        "number": "040-123456",
-        "id": 1
-      },
-      {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": 2
-      },
-      {
-        "name": "Dan Abramov",
-        "number": "39-44-53235",
-        "id": 3
-      },
-      {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122",
-        "id": 4
-      },
-      {
-        "name": "Janne",
-        "number": "435834987",
-        "id": 5
-      }
-]
-
 
 const generateId = () => {
     return Math.floor(Math.random() * 999) + 1
 }
 
 app.get('/info', (req, res) => {
-    res.send(`Phonebook has info for ${persons.length} people. <br/><br/>${new Date()}`)
+    Contact.estimatedDocumentCount().then(count => {
+        res.send(`Phonebook has info for ${count} people. <br/><br/>${new Date()}`)
+    })
 })
 
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+    Contact.find({}).then(result => {
+        res.json(result)
+    })
 })
 
 app.get('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const person = persons.find(person => person.id === id)
-
-    if (person) {
-        res.json(person)
-    } else {
-        res.status(404).end()
-    }
+    Contact.findById(req.params.id).then(person => {
+        if (person) {
+            res.json(person)
+        } else {
+            res.status(404).end()
+        }
+    })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
