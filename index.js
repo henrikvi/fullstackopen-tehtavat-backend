@@ -19,10 +19,6 @@ app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'))
 
 
-const generateId = () => {
-    return Math.floor(Math.random() * 999) + 1
-}
-
 app.get('/info', (req, res) => {
     Contact.estimatedDocumentCount().then(count => {
         res.send(`Phonebook has info for ${count} people. <br/><br/>${new Date()}`)
@@ -62,20 +58,17 @@ app.post('/api/persons', (req, res) => {
         })
     }
 
-    if (persons.find(p => p.name === body.name)) {
-        return res.status(400).json({
-            error: 'name must be unique'
-        })
-    }
-
-    const person = {
+    const contact = new Contact({
         name: body.name,
-        number: body.number,
-        id: generateId()
-    }
+        number: body.number
+    })
 
-    persons = persons.concat(person)
-    res.json(person)
+    contact.save()
+    .then(result => {
+        res.json(result)
+        console.log('new contact added')
+    })
+    .catch(error => console.log('Error saving contact: ', error))
 })
 
 const PORT = process.env.PORT
